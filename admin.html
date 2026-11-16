@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#080909">
+    <meta name="description" content="Nursing Prep administrative portal for questions, students, and payment management.">
+    <title>Nursing Prep Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin.css">
+    <script src="/admin.js" defer></script>
+  </head>
+  <body class="admin-body">
+    <!-- Initial loading state while authenticating session and verifying claims -->
+    <div id="admin-loading" class="admin-loading-screen" role="status" aria-label="Verifying credentials">
+      <div class="admin-spinner" aria-hidden="true"></div>
+      <p class="admin-loading-text">Verifying administrative access…</p>
+    </div>
+
+    <!-- Sign-in view for unauthenticated visitors -->
+    <main id="admin-auth" class="admin-auth-screen" hidden>
+      <div class="auth-panel admin-auth-panel">
+        <div class="admin-brand-header">
+          <span class="brand-name"><span>Nursing</span><strong>Prep</strong></span>
+          <span class="admin-badge">Admin</span>
+        </div>
+        <p class="eyebrow">Staff Portal</p>
+        <h1 id="admin-auth-title" tabindex="-1">Sign in</h1>
+        <p class="auth-intro">Sign in with an authorized account to manage the nursing question banks, students, and payments.</p>
+        <form id="admin-login-form" class="auth-form" autocomplete="on">
+          <label class="field-label" for="admin-email">Admin email address</label>
+          <input id="admin-email" name="email" type="email" autocomplete="email" required placeholder="admin@wellspring.edu.ng">
+          <label class="field-label" for="admin-password">Password</label>
+          <input id="admin-password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+          <p id="admin-login-error" class="message error-message" role="alert" hidden></p>
+          <button id="admin-login-btn" class="button button-primary button-wide" type="submit">
+            Sign in to admin <span aria-hidden="true">→</span>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Access denied view when signed-in account lacks the admin claim -->
+    <main id="admin-denied" class="admin-denied-screen" hidden>
+      <div class="auth-panel admin-denied-panel">
+        <div class="admin-denied-mark" aria-hidden="true">✕</div>
+        <p class="eyebrow" style="color: var(--red);">Access Denied</p>
+        <h1 id="admin-denied-title" tabindex="-1">Administrator Access Required</h1>
+        <p class="auth-intro">
+          You are signed in as <strong id="denied-user-email"></strong>, but this account has not been assigned administrative privileges.
+        </p>
+        <div class="admin-denied-actions">
+          <button id="admin-denied-signout-btn" class="button button-primary" type="button">Sign out</button>
+          <a class="button button-secondary" href="/">Go to Student App</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Primary Admin Shell -->
+    <div id="admin-shell" class="admin-shell" hidden>
+      <aside class="admin-sidebar" aria-label="Admin Navigation">
+        <div class="admin-sidebar-top">
+          <a class="brand admin-brand" href="#overview" aria-label="Nursing Prep Admin home">
+            <span class="brand-name"><span>Nursing</span><strong>Prep</strong></span>
+            <span class="admin-badge">Admin</span>
+          </a>
+        </div>
+
+        <nav class="admin-nav" aria-label="Admin sections">
+          <a class="admin-nav-item is-active" href="#overview" data-route="overview">
+            <span class="admin-nav-icon" aria-hidden="true">◈</span>
+            <span class="admin-nav-text">Overview</span>
+          </a>
+          <a class="admin-nav-item" href="#questions" data-route="questions">
+            <span class="admin-nav-icon" aria-hidden="true">☷</span>
+            <span class="admin-nav-text">Questions</span>
+          </a>
+          <a class="admin-nav-item" href="#students" data-route="students">
+            <span class="admin-nav-icon" aria-hidden="true">👥</span>
+            <span class="admin-nav-text">Students</span>
+          </a>
+          <a class="admin-nav-item" href="#payments" data-route="payments">
+            <span class="admin-nav-icon" aria-hidden="true">💳</span>
+            <span class="admin-nav-text">Payments</span>
+          </a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+          <div class="admin-user-details">
+            <span class="admin-user-caption">Admin Account</span>
+            <span id="admin-user-email" class="admin-user-email" title="">—</span>
+          </div>
+          <button id="admin-signout-btn" class="button button-secondary admin-signout-btn" type="button">Sign out</button>
+        </div>
+      </aside>
+
+      <div class="admin-workspace">
+        <header class="admin-topbar">
+          <div>
+            <p class="eyebrow">Administrative Workspace</p>
+            <h1 id="admin-view-heading" class="admin-view-heading" tabindex="-1">Overview</h1>
+          </div>
+          <div class="admin-topbar-actions">
+            <a class="button button-secondary admin-student-link" href="/" target="_blank" rel="noopener">
+              Student App <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </header>
+
+        <main id="admin-view-content" class="admin-view-content" aria-live="polite">
+          <!-- Populated dynamically by the registered route view functions -->
+        </main>
+      </div>
+    </div>
+
+    <!-- Stacked notifications container -->
+    <div id="toast-container" class="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+  </body>
+</html>
