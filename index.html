@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#080909">
+    <meta name="description" content="Build clinical confidence with a focused nursing CBT practice experience.">
+    <title>Nursing Prep | Nursing CBT</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#landing-screen" data-screen="landing" aria-label="Nursing Prep home">
+        <span class="brand-name"><span>Nursing</span><strong>Prep</strong></span>
+      </a>
+      <nav class="primary-nav" aria-label="Main navigation" id="account-nav" hidden>
+        <a class="nav-link" href="#home-screen" data-screen="home">Overview</a>
+        <a class="nav-link" href="#setup-title" data-screen="setup">Practice</a>
+        <a class="nav-link" href="#progress-section" data-screen="progress">Progress</a>
+      </nav>
+      <div class="header-actions">
+        <button class="header-login" type="button" data-action="login">Log in</button>
+        <a class="header-cta" href="#auth-screen" data-action="signup">Create account <span aria-hidden="true">↗</span></a>
+        <button class="header-login" type="button" data-action="logout" hidden>Sign out</button>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section id="landing-screen" class="landing-screen is-entering" aria-labelledby="landing-title">
+        <section class="landing-hero">
+          <div class="intro">
+            <p class="eyebrow">Nursing CBT preparation</p>
+            <h1 id="landing-title">Your next level<br><span>starts with practice.</span></h1>
+            <p class="intro-copy">A focused nursing exam-prep space built around the questions you need, clear explanations, and progress you can track over time.</p>
+            <div class="landing-hero-actions">
+              <a class="button button-primary hero-cta" href="#auth-screen" data-action="signup">Create your account <span aria-hidden="true">→</span></a>
+              <button class="landing-login-link" type="button" data-action="login">Already have an account? Log in</button>
+            </div>
+            <p class="source-note">For learning and exam practice only. Always follow current clinical guidance and local protocols.</p>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="study-cycle-stage">
+              <div class="study-cycle-ring study-cycle-ring-one"></div>
+              <div class="study-cycle-ring study-cycle-ring-two"></div>
+              <div class="study-cycle-node study-node-notice"><span>01</span><strong>Practice</strong><small>Build a habit</small></div>
+              <div class="study-cycle-node study-node-think"><span>02</span><strong>Understand</strong><small>Learn from feedback</small></div>
+              <div class="study-cycle-node study-node-respond"><span>03</span><strong>Progress</strong><small>Track your growth</small></div>
+              <div class="study-cycle-core"><span class="study-cycle-symbol">↻</span><strong>STUDY</strong><small>CYCLE</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="landing-facts" aria-label="Nursing Prep at a glance">
+          <article><strong>300</strong><span>questions in the 300-level bank</span></article>
+          <article><strong>150 / 150</strong><span>medium and hard questions</span></article>
+          <article><strong>70 / 30</strong><span>written response and multiple choice</span></article>
+          <article><strong>One-time</strong><span>access fee · amount to be announced</span></article>
+        </section>
+
+        <section class="landing-details" aria-label="How Nursing Prep works">
+          <article class="landing-detail-card">
+            <span class="landing-detail-number">01</span>
+            <p class="eyebrow">Practice your way</p>
+            <h2>Focused nursing questions.</h2>
+            <p>Choose medium, hard, or a mix. Filter by topic, take an untimed session, or set a timer for exam-style practice.</p>
+          </article>
+          <article class="landing-detail-card">
+            <span class="landing-detail-number">02</span>
+            <p class="eyebrow">Understand every answer</p>
+            <h2>Feedback that helps you learn.</h2>
+            <p>Check answers as you go, then review explanations and source references when you finish a session.</p>
+          </article>
+          <article class="landing-detail-card">
+            <span class="landing-detail-number">03</span>
+            <p class="eyebrow">Made for your level</p>
+            <h2>Your studies, your context.</h2>
+            <p>Create an account with your university and academic level. The question bank is currently populated for 300 level; 200 and 400 level content can be added as it becomes available.</p>
+          </article>
+        </section>
+
+        <section class="landing-access" aria-label="Getting started">
+          <div>
+            <p class="eyebrow">Get started</p>
+            <h2>Make your next study session count.</h2>
+            <p>Sign up with Wellspring University and your level. One-time access payment will be collected through Paystack when the fee is configured.</p>
+          </div>
+          <a class="button button-primary" href="#auth-screen" data-action="signup">Join Nursing Prep <span aria-hidden="true">→</span></a>
+        </section>
+      </section>
+
+      <section id="auth-screen" class="auth-screen" aria-labelledby="auth-title" hidden>
+        <div class="auth-panel">
+          <a class="back-link" href="#landing-screen" data-screen="landing">← Back to Nursing Prep</a>
+          <p class="eyebrow">Your study account</p>
+          <h1 id="auth-title" tabindex="-1">Welcome back.</h1>
+          <p class="auth-intro">Sign in to continue your nursing exam preparation, or create an account to get started.</p>
+          <div class="auth-tabs" role="tablist" aria-label="Account access">
+            <button id="login-tab" class="auth-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="login-form" data-auth-mode="login">Log in</button>
+            <button id="signup-tab" class="auth-tab" type="button" role="tab" aria-selected="false" aria-controls="signup-form" data-auth-mode="signup">Create account</button>
+          </div>
+          <p id="firebase-config-notice" class="message error-message" role="alert" hidden></p>
+          <form id="login-form" class="auth-form" autocomplete="on">
+            <label class="field-label" for="login-email">Email address</label>
+            <input id="login-email" name="email" type="email" autocomplete="email" required>
+            <label class="field-label" for="login-password">Password</label>
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+            <p id="login-error" class="message error-message" role="alert" hidden></p>
+            <button id="login-button" class="button button-primary button-wide" type="submit">Log in <span aria-hidden="true">→</span></button>
+            <button id="forgot-password-button" class="text-button" type="button">Forgot your password?</button>
+          </form>
+          <form id="signup-form" class="auth-form" autocomplete="on" hidden>
+            <label class="field-label" for="signup-name">Full name</label>
+            <input id="signup-name" name="name" type="text" autocomplete="name" maxlength="100" required>
+            <label class="field-label" for="signup-email">Email address</label>
+            <input id="signup-email" name="email" type="email" autocomplete="email" required>
+            <label class="field-label" for="signup-password">Password</label>
+            <input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+            <label class="field-label" for="signup-university">University</label>
+            <select id="signup-university" name="university" required>
+              <option value="Wellspring University">Wellspring University</option>
+            </select>
+            <label class="field-label" for="signup-level">Academic level</label>
+            <select id="signup-level" name="academicLevel" required>
+              <option value="200">200 level</option>
+              <option value="300" selected>300 level</option>
+              <option value="400">400 level</option>
+            </select>
+            <p class="auth-helper">Your selected level will shape the questions and progress shown in your dashboard.</p>
+            <p id="signup-error" class="message error-message" role="alert" hidden></p>
+            <button id="signup-button" class="button button-primary button-wide" type="submit">Create account <span aria-hidden="true">→</span></button>
+            <p class="auth-terms">By creating an account, you agree to use Nursing Prep as a study aid—not as a substitute for clinical guidance.</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="profile-screen" class="auth-screen" aria-labelledby="profile-title" hidden>
+        <div class="auth-panel">
+          <p class="eyebrow">Complete your profile</p>
+          <h1 id="profile-title" tabindex="-1">Set your study context.</h1>
+          <p class="auth-intro">Choose your university and level so we can show the right question bank and progress.</p>
+          <form id="profile-form" class="auth-form">
+            <label class="field-label" for="profile-university">University</label>
+            <select id="profile-university" name="university" required>
+              <option value="Wellspring University">Wellspring University</option>
+            </select>
+            <label class="field-label" for="profile-level">Academic level</label>
+            <select id="profile-level" name="academicLevel" required>
+              <option value="200">200 level</option>
+              <option value="300">300 level</option>
+              <option value="400">400 level</option>
+            </select>
+            <p id="profile-error" class="message error-message" role="alert" hidden></p>
+            <button class="button button-primary button-wide" type="submit">Continue <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+      </section>
+
+      <section id="checkout-screen" class="auth-screen" aria-labelledby="checkout-title" hidden>
+        <div class="auth-panel checkout-panel">
+          <p class="eyebrow">One-time access</p>
+          <h1 id="checkout-title" tabindex="-1">Your study plan is ready.</h1>
+          <p class="auth-intro">Confirm your university and level, then continue to secure Paystack checkout. Your dashboard unlocks after payment is verified.</p>
+          <dl class="checkout-summary">
+            <div><dt>University</dt><dd id="checkout-university">—</dd></div>
+            <div><dt>Academic level</dt><dd id="checkout-level">—</dd></div>
+            <div><dt>Access</dt><dd>One-time payment</dd></div>
+            <div><dt>Fee</dt><dd id="checkout-amount">To be announced</dd></div>
+          </dl>
+          <p id="checkout-message" class="message" role="status" aria-live="polite"></p>
+          <p id="checkout-error" class="message error-message" role="alert" hidden></p>
+          <button id="checkout-button" class="button button-primary button-wide" type="button">Continue to payment <span aria-hidden="true">→</span></button>
+          <button id="checkout-signout-button" class="text-button" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <section id="home-screen" class="home-screen is-entering" aria-labelledby="home-title" hidden>
+        <section class="home-welcome">
+          <div class="home-welcome-copy">
+            <p id="dashboard-context" class="eyebrow">Your study space</p>
+            <h1 id="home-title" tabindex="-1">Practice with purpose.<br><span>Progress at your pace.</span></h1>
+            <p>Build clinical confidence with focused nursing questions, clear explanations, and room to learn as you go.</p>
+            <p id="level-content-notice" class="level-content-notice" role="status" hidden></p>
+            <div class="home-actions">
+              <a class="button button-primary" href="#setup-title" data-screen="setup">Set up a practice session <span aria-hidden="true">→</span></a>
+              <a class="button button-secondary" href="#progress-section" data-screen="progress">View your progress</a>
+            </div>
+          </div>
+          <div class="home-welcome-note">
+            <span class="welcome-note-mark" aria-hidden="true">01</span>
+            <p>Small, consistent sessions can make a difference.</p>
+            <span>Start wherever you are.</span>
+          </div>
+        </section>
+
+        <section class="home-stats" aria-label="Your study overview">
+          <article class="home-stat">
+            <span>Questions to explore</span>
+            <strong id="home-question-count">—</strong>
+          </article>
+          <article class="home-stat">
+            <span>Topics to practice</span>
+            <strong id="home-topic-count">—</strong>
+          </article>
+          <article class="home-stat">
+            <span>Sessions completed</span>
+            <strong id="home-session-count">0</strong>
+          </article>
+        </section>
+
+        <div class="home-content-grid">
+          <section class="home-card quick-practice-card" aria-labelledby="quick-practice-title">
+            <div class="home-section-heading">
+              <div>
+                <p class="eyebrow">Jump right in</p>
+                <h2 id="quick-practice-title">Quick practice</h2>
+              </div>
+              <span class="home-card-icon" aria-hidden="true">↗</span>
+            </div>
+            <p>Choose a starting point. You can adjust every setting before the exam begins.</p>
+            <div class="quick-practice-options">
+              <button class="quick-practice-option" type="button" data-quick-count="10" data-quick-duration="0">
+                <span><strong>10 questions</strong><small>A short, untimed session</small></span><span aria-hidden="true">→</span>
+              </button>
+              <button class="quick-practice-option" type="button" data-quick-count="50" data-quick-duration="60">
+                <span><strong>Full practice exam</strong><small>50 questions · 60 minutes</small></span><span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="home-card topic-card" aria-labelledby="topic-shortcuts-title">
+            <div class="home-section-heading">
+              <div>
+                <p class="eyebrow">Study by subject</p>
+                <h2 id="topic-shortcuts-title">Explore topics</h2>
+              </div>
+            </div>
+            <p>Choose a topic to build a focused practice session.</p>
+            <div id="topic-shortcuts" class="topic-shortcuts"></div>
+          </section>
+
+          <section id="progress-section" class="home-card progress-card" aria-labelledby="progress-title">
+            <div class="home-section-heading">
+              <div>
+                <p class="eyebrow">Your learning, over time</p>
+                <h2 id="progress-title" tabindex="-1">Progress</h2>
+              </div>
+              <span class="local-data-label">Saved to your account</span>
+            </div>
+            <p id="history-notice" class="message error-message" role="status" hidden></p>
+            <div class="progress-stats">
+              <div><span>Average score</span><strong id="home-average-score">—</strong></div>
+              <div><span>Questions practiced</span><strong id="home-questions-practiced">0</strong></div>
+            </div>
+            <div class="recent-sessions-heading">
+              <h3>Recent sessions</h3>
+              <span id="recent-session-count">No sessions yet</span>
+            </div>
+            <div id="recent-sessions" class="recent-sessions">
+              <p class="empty-history">Complete a practice session to see your results here.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="setup-screen" class="setup-layout is-entering" hidden>
+        <section class="landing-hero">
+          <div class="intro">
+            <p class="eyebrow">Practice session</p>
+            <h1 tabindex="-1">Choose your focus.<br><span>Make it your own.</span></h1>
+            <p class="intro-copy">Set a topic, difficulty, and pace. You can review your answers and explanations after the session.</p>
+            <a class="button button-primary hero-cta" href="#setup-form">Configure your session <span aria-hidden="true">→</span></a>
+            <p class="source-note">For learning only—always follow current clinical guidance and local protocols.</p>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <div class="study-cycle-stage">
+              <div class="study-cycle-ring study-cycle-ring-one"></div>
+              <div class="study-cycle-ring study-cycle-ring-two"></div>
+              <div class="study-cycle-node study-node-notice"><span>01</span><strong>Notice</strong><small>Observe</small></div>
+              <div class="study-cycle-node study-node-think"><span>02</span><strong>Think</strong><small>Connect</small></div>
+              <div class="study-cycle-node study-node-respond"><span>03</span><strong>Respond</strong><small>Reflect</small></div>
+              <div class="study-cycle-core"><span class="study-cycle-symbol">↻</span><strong>STUDY</strong><small>CYCLE</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="setup-card" aria-labelledby="setup-title">
+          <div class="card-heading">
+            <p class="eyebrow">Your next study session</p>
+            <h2 id="setup-title">Choose what to practice</h2>
+            <p class="setup-intro">Choose what you’d like to work on. You can review every answer after the session.</p>
+          </div>
+          <form id="setup-form">
+            <div class="setup-field setup-field-difficulty">
+              <label class="field-label" for="level-select">Difficulty</label>
+              <div class="select-control">
+                <select id="level-select" name="level">
+                  <option value="mixed">Mixed — medium and hard</option>
+                  <option value="medium">Medium only</option>
+                  <option value="hard">Hard only</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setup-field setup-field-topic">
+              <label class="field-label" for="topic-select">Topic</label>
+              <div class="select-control">
+                <select id="topic-select" name="topic">
+                  <option value="">All topics</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="setup-field setup-field-count">
+                <label class="field-label" for="question-count">Number of questions</label>
+                <div class="number-control">
+                  <input id="question-count" name="count" type="number" min="1" max="300" step="1" value="50" required>
+                  <div class="number-stepper" aria-label="Adjust number of questions">
+                    <button class="step-button" type="button" data-count-step="-1" aria-label="Decrease number of questions">−</button>
+                    <button class="step-button" type="button" data-count-step="1" aria-label="Increase number of questions">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="setup-field setup-field-duration">
+                <label class="field-label" for="duration-select">Time limit</label>
+                <div class="select-control">
+                  <select id="duration-select" name="duration">
+                    <option value="0">No timer</option>
+                    <option value="30">30 minutes</option>
+                    <option value="60" selected>60 minutes</option>
+                    <option value="90">90 minutes</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <p id="availability-note" class="field-hint" aria-live="polite"></p>
+            <p id="setup-error" class="message error-message" role="alert" hidden></p>
+            <button id="start-button" class="button button-primary button-wide" type="submit">Start practice exam <span aria-hidden="true">→</span></button>
+          </form>
+        </section>
+        <aside id="how-it-works" class="study-aside" aria-labelledby="study-aside-title">
+          <p class="eyebrow">A simple rhythm</p>
+          <h2 id="study-aside-title">Learn at your own pace.</h2>
+          <p class="study-aside-copy">No pressure to know it all already. Practice, check what you understand, and use the explanations to guide your next step.</p>
+          <ol class="study-steps">
+            <li><span>01</span><div><strong>Pick a focus</strong><small>Choose a topic, difficulty, and time limit.</small></div></li>
+            <li><span>02</span><div><strong>Work through questions</strong><small>Write your answer or choose an option.</small></div></li>
+            <li><span>03</span><div><strong>Review and reflect</strong><small>See explanations and references when you finish.</small></div></li>
+          </ol>
+        </aside>
+      </section>
+
+      <section id="exam-screen" class="exam-layout" aria-label="Practice exam" hidden>
+        <div class="exam-main">
+          <div class="exam-topline">
+            <div>
+              <p class="eyebrow">Practice exam</p>
+              <h1 id="exam-title">Mixed nursing questions</h1>
+            </div>
+            <div class="timer-box" aria-live="polite">
+              <span class="timer-label">Time remaining</span>
+              <strong id="timer">60:00</strong>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-copy">
+              <span id="progress-text">Question 1 of 50</span>
+              <span id="answered-text">0 answered</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-label="Exam progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <span id="progress-fill"></span>
+            </div>
+          </div>
+
+          <article id="question-card" class="question-card">
+            <div class="question-meta">
+              <span id="question-level" class="pill">Medium</span>
+              <span id="question-topic" class="topic-label"></span>
+            </div>
+            <h2 id="question-stem" tabindex="-1"></h2>
+            <fieldset id="option-list" class="option-list">
+              <legend class="sr-only">Answer the question</legend>
+            </fieldset>
+            <section id="answer-feedback" class="answer-feedback" role="status" aria-live="polite" hidden>
+              <strong id="feedback-heading"></strong>
+              <p id="feedback-answer"></p>
+              <p id="feedback-explanation"></p>
+            </section>
+            <p id="exam-message" class="message error-message" role="alert" hidden></p>
+            <div class="question-actions">
+              <button id="previous-button" class="button button-secondary" type="button">← Previous</button>
+              <button id="mark-button" class="button button-quiet" type="button" aria-pressed="false">☆ Mark for review</button>
+              <button id="next-button" class="button button-primary" type="button">Next →</button>
+            </div>
+          </article>
+        </div>
+
+        <aside class="exam-sidebar" aria-label="Question navigation">
+          <div class="sidebar-heading">
+            <div>
+              <h2>Questions</h2>
+              <p>Jump to any item</p>
+            </div>
+            <button id="submit-button" class="button button-submit" type="button">Submit exam</button>
+          </div>
+          <div class="nav-legend">
+            <span><i class="legend-dot answered-dot"></i> Answered</span>
+            <span><i class="legend-dot marked-dot"></i> Review</span>
+          </div>
+          <nav id="question-nav" class="question-nav" aria-label="Go to question"></nav>
+          <p id="unanswered-warning" class="sidebar-hint"></p>
+        </aside>
+      </section>
+
+      <div id="mobile-submit-bar" class="mobile-submit-bar" hidden>
+        <span id="mobile-answered-count" aria-live="polite">0 of 0 answered</span>
+        <button id="mobile-submit-button" class="button button-submit" type="button">Submit exam</button>
+      </div>
+
+      <section id="result-screen" class="result-layout" hidden>
+        <div class="result-heading">
+          <p class="eyebrow">Session complete</p>
+          <h1 tabindex="-1">Your results</h1>
+          <p id="score-message" class="result-summary"></p>
+          <p id="result-history-notice" class="message error-message" role="status" hidden></p>
+          <div class="score-card">
+            <strong id="score-percent">0%</strong>
+            <span id="score-detail">0 of 0 correct</span>
+          </div>
+          <div class="result-actions">
+            <button id="retry-button" class="button button-primary" type="button">Take another exam</button>
+            <button id="home-button" class="button button-secondary" type="button">Back to overview</button>
+            <label class="filter-label" for="review-filter">Review</label>
+            <select id="review-filter">
+              <option value="all">All questions</option>
+              <option value="incorrect">Incorrect only</option>
+              <option value="unanswered">Unanswered only</option>
+            </select>
+          </div>
+        </div>
+        <div id="review-list" class="review-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Nursing CBT practice</span>
+      <span>Practice with purpose <span aria-hidden="true">·</span> Progress with confidence</span>
+    </footer>
+  </body>
+</html>
