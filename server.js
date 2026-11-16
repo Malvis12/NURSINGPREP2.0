@@ -8,6 +8,8 @@ const { createHmac, randomUUID, timingSafeEqual } = require("node:crypto");
 const { applicationDefault, getApps, initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue, getFirestore } = require("firebase-admin/firestore");
+const { HttpError } = require("./server/http-error");
+const { handleAdminRoute } = require("./server/admin/routes");
 
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT) || 3000;
@@ -21,14 +23,10 @@ const staticFiles = new Map([
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/assets/nursing-prep-logo.png", ["assets/nursing-prep-logo.png", "image/png"]],
+  ["/admin.html", ["admin.html", "text/html; charset=utf-8"]],
+  ["/admin.js", ["admin.js", "text/javascript; charset=utf-8"]],
+  ["/admin.css", ["admin.css", "text/css; charset=utf-8"]],
 ]);
-
-class HttpError extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
 
 let firebaseServices;
 
@@ -773,6 +771,9 @@ function serveStatic(pathname, response, method) {
 }
 
 async function handleApi(request, response, requestUrl) {
+  if (await handleAdminRoute(request, response, requestUrl)) {
+    return;
+  }
   const { pathname } = requestUrl;
   if (pathname === "/api/config" && request.method === "GET") {
     sendJson(response, 200, getPublicFirebaseConfig());
