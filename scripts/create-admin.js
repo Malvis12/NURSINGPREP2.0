@@ -55,6 +55,7 @@ async function main() {
   if (revoke) {
     delete updatedClaims.admin;
     await auth.setCustomUserClaims(userRecord.uid, updatedClaims);
+    await auth.revokeRefreshTokens(userRecord.uid);
     console.log(`Successfully revoked admin privileges from: ${email} (UID: ${userRecord.uid})`);
   } else {
     updatedClaims.admin = true;

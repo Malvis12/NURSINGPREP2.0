@@ -26,6 +26,7 @@ const staticFiles = new Map([
   ["/admin.html", ["admin.html", "text/html; charset=utf-8"]],
   ["/admin.js", ["admin.js", "text/javascript; charset=utf-8"]],
   ["/admin.css", ["admin.css", "text/css; charset=utf-8"]],
+  ["/admin-table.js", ["admin-table.js", "text/javascript; charset=utf-8"]],
 ]);
 
 let firebaseServices;
@@ -49,18 +50,7 @@ function getFirebaseServices() {
   return firebaseServices;
 }
 
-function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-  });
-  response.end(JSON.stringify(payload));
-}
-
-function sendError(response, statusCode, message) {
-  sendJson(response, statusCode, { error: message });
-}
+const { sendJson, sendError } = require("./server/http-helpers");
 
 function readRawBody(request) {
   return new Promise((resolve, reject) => {

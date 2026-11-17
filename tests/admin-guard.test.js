@@ -3,6 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { assertAdminClaims } = require("../server/admin/guard");
+const { handleAdminRoute } = require("../server/admin/routes");
 const { HttpError } = require("../server/http-error");
 
 test("assertAdminClaims passes when admin is true", () => {
@@ -33,5 +34,23 @@ test("assertAdminClaims throws 403 for missing or false admin claim", () => {
       },
       `Expected 403 error for claims: ${JSON.stringify(claims)}`
     );
+  }
+});
+
+test("handleAdminRoute returns false for non-admin paths without needing Firebase", async () => {
+  const nonAdminPaths = [
+    "/",
+    "/index.html",
+    "/styles.css",
+    "/api/config",
+    "/api/health",
+    "/api/profile",
+    "/api/questions",
+    "/api/submit",
+  ];
+
+  for (const path of nonAdminPaths) {
+    const handled = await handleAdminRoute({}, {}, new URL(path, "http://127.0.0.1"));
+    assert.equal(handled, false, `Expected false for path: ${path}`);
   }
 });

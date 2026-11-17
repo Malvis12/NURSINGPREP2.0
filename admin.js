@@ -1,5 +1,7 @@
 "use strict";
 
+import { createDataTable } from "./admin-table.js";
+
 // Module state
 let firebaseAuth = null;
 let firebaseSdk = null;
@@ -116,17 +118,235 @@ function renderEmptyState(container, title, hint, symbol = "◈") {
 }
 
 // ==========================================================================
-// 3. Hash-Based Router & View Registrations
-// Extensible route table allowing subsequent feature modules to plug in views.
+// 3. View Implementations & Number Animation
 // ==========================================================================
 
-function renderOverviewView(container) {
-  renderEmptyState(
-    container,
-    "Overview Dashboard",
-    "System metrics, question bank totals, and active student sessions will be displayed here.",
-    "◈"
-  );
+function animateNumber(element, target, duration = 600) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    element.textContent = target.toLocaleString();
+    return;
+  }
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(target * ease);
+    element.textContent = current.toLocaleString();
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+  requestAnimationFrame(update);
+}
+
+function formatRevenue(minor, currency = "NGN") {
+  try {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(minor / 100);
+  } catch {
+    return `${currency} ${(minor / 100).toFixed(2)}`;
+  }
+}
+
+async function renderOverviewView(container) {
+  container.replaceChildren();
+
+  // Top action bar with Refresh control
+  const headerBar = document.createElement("div");
+  headerBar.className = "overview-header-bar";
+
+  const title = document.createElement("h2");
+  title.className = "overview-section-title";
+  title.textContent = "Platform Metrics";
+
+  const refreshBtn = document.createElement("button");
+  refreshBtn.type = "button";
+  refreshBtn.className = "button button-secondary";
+  refreshBtn.style.minHeight = "36px";
+  refreshBtn.style.fontSize = "11px";
+  refreshBtn.innerHTML = '↻ Refresh Metrics';
+
+  headerBar.append(title, refreshBtn);
+  container.append(headerBar);
+
+  // 4-Card Metrics Grid
+  const grid = document.createElement("div");
+  grid.className = "overview-grid";
+  container.append(grid);
+
+  function renderSkeletonCards() {
+    grid.replaceChildren();
+    for (let i = 0; i < 4; i += 1) {
+      const card = document.createElement("div");
+      card.className = "stat-card";
+      const lbl = document.createElement("div");
+      lbl.className = "skeleton";
+      lbl.style.height = "12px";
+      lbl.style.width = "40%";
+      const val = document.createElement("div");
+      val.className = "skeleton";
+      val.style.height = "28px";
+      val.style.width = "60%";
+      const sub = document.createElement("div");
+      sub.className = "skeleton";
+      sub.style.height = "12px";
+      sub.style.width = "75%";
+      card.append(lbl, val, sub);
+      grid.append(card);
+    }
+  }
+
+  // Recent signups table section
+  const tableTitle = document.createElement("h2");
+  tableTitle.className = "overview-section-title";
+  tableTitle.style.marginTop = "36px";
+  tableTitle.style.marginBottom = "14px";
+  tableTitle.textContent = "Recent Student Signups";
+  container.append(tableTitle);
+
+  const table = createDataTable({
+    caption: "Five most recent student registrations",
+    columns: [
+      { key: "displayName", label: "Name", render: (r) => r.displayName || "—" },
+      { key: "email", label: "Email", render: (r) => r.email || "—" },
+      { key: "academicLevel", label: "Level", nowrap: true, render: (r) => `${r.academicLevel || "—"} Level` },
+      {
+        key: "membershipStatus",
+        label: "Status",
+        nowrap: true,
+        render: (r) => {
+          const pill = document.createElement("span");
+          pill.className = "pill";
+          if (r.membershipStatus === "active") {
+            pill.classList.add("multiple-choice");
+            pill.textContent = "Active";
+          } else if (r.membershipStatus === "pending_payment") {
+            pill.classList.add("hard");
+            pill.textContent = "Pending Payment";
+          } else {
+            pill.textContent = r.membershipStatus || "—";
+          }
+          return pill;
+        },
+      },
+      {
+        key: "createdAt",
+        label: "Signed Up",
+        nowrap: true,
+        render: (r) => {
+          if (!r.createdAt) return "—";
+          try {
+            return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" })
+              .format(new Date(r.createdAt));
+          } catch {
+            return r.createdAt;
+          }
+        },
+      },
+    ],
+    emptyTitle: "No registered students yet",
+    emptyHint: "When students create an account, their details will appear here.",
+    onRetry: () => loadData(true),
+  });
+
+  container.append(table.element);
+
+  async function loadData(forceRefresh = false) {
+    renderSkeletonCards();
+    table.setLoading();
+    refreshBtn.disabled = true;
+
+    try {
+      const url = forceRefresh ? "/api/admin/overview?refresh=1" : "/api/admin/overview";
+      const data = await adminRequest(url);
+
+      // Populate 4 Stat Cards
+      grid.replaceChildren();
+
+      // Card 1: Students
+      const card1 = document.createElement("div");
+      card1.className = "stat-card";
+      card1.innerHTML = `
+        <span class="stat-card-label">Total Students</span>
+        <h3 class="stat-card-value">0</h3>
+        <p class="stat-card-subtext">${data.students.active} active · ${data.students.pendingPayment} pending</p>
+      `;
+      animateNumber(card1.querySelector("h3"), data.students.total);
+
+      // Card 2: Revenue
+      const card2 = document.createElement("div");
+      card2.className = "stat-card";
+      card2.innerHTML = `
+        <span class="stat-card-label">Verified Revenue</span>
+        <h3 class="stat-card-value">${formatRevenue(data.revenue.minor, data.revenue.currency)}</h3>
+        <p class="stat-card-subtext">Paystack successful charges</p>
+      `;
+
+      // Card 3: Questions
+      const card3 = document.createElement("div");
+      card3.className = "stat-card";
+      card3.innerHTML = `
+        <span class="stat-card-label">Question Bank</span>
+        <h3 class="stat-card-value">0</h3>
+        <div class="stat-pill-group">
+          <span class="pill">${data.questions.published} published</span>
+          <span class="pill">200L: ${data.questions.byLevel["200"]}</span>
+          <span class="pill">300L: ${data.questions.byLevel["300"]}</span>
+          <span class="pill">400L: ${data.questions.byLevel["400"]}</span>
+        </div>
+      `;
+      animateNumber(card3.querySelector("h3"), data.questions.total);
+
+      // Card 4: Exams
+      const card4 = document.createElement("div");
+      card4.className = "stat-card";
+      card4.innerHTML = `
+        <span class="stat-card-label">Exams Completed</span>
+        <h3 class="stat-card-value">0</h3>
+        <p class="stat-card-subtext">Across all student levels</p>
+      `;
+      animateNumber(card4.querySelector("h3"), data.exams.completed);
+
+      grid.append(card1, card2, card3, card4);
+      table.setRows(data.recentSignups);
+
+      if (forceRefresh) {
+        toast("Overview data refreshed.", "success");
+      }
+    } catch (error) {
+      grid.replaceChildren();
+      const errCard = document.createElement("div");
+      errCard.className = "stat-card stat-card-error";
+      errCard.style.gridColumn = "1 / -1";
+      errCard.innerHTML = `
+        <span class="stat-card-label" style="color: var(--red);">Metrics Unavailable</span>
+        <p class="stat-card-subtext">${error.message}</p>
+      `;
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "button button-secondary";
+      retry.style.minHeight = "34px";
+      retry.style.fontSize = "11px";
+      retry.textContent = "Retry";
+      retry.addEventListener("click", () => loadData(true));
+      errCard.append(retry);
+      grid.append(errCard);
+
+      table.setError(error.message);
+      if (forceRefresh) {
+        toast(`Refresh failed: ${error.message}`, "error");
+      }
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  }
+
+  refreshBtn.addEventListener("click", () => loadData(true));
+  await loadData(false);
 }
 
 function renderQuestionsView(container) {
@@ -155,6 +375,10 @@ function renderPaymentsView(container) {
     "💳"
   );
 }
+
+// ==========================================================================
+// 4. Hash-Based Router Table
+// ==========================================================================
 
 const routes = {
   overview: { title: "Overview", render: renderOverviewView },
@@ -193,7 +417,7 @@ function navigateRoute(hash) {
 }
 
 // ==========================================================================
-// 4. Screen Transition Manager & Client Authentication
+// 5. Screen Transition Manager & Client Authentication
 // ==========================================================================
 
 function showScreen(screen) {
@@ -239,7 +463,6 @@ async function handleAdminSignIn(event) {
 
   try {
     const credential = await firebaseSdk.signInWithEmailAndPassword(firebaseAuth, email, password);
-    // Force token refresh to pick up custom claims that may have been assigned recently
     await credential.user.getIdToken(true);
     await verifyAndEnterAdmin(credential.user);
   } catch (error) {
@@ -263,7 +486,6 @@ async function handleAdminSignOut() {
 async function verifyAndEnterAdmin(user) {
   showScreen("loading");
   try {
-    // Force a fresh ID token before pinging the guard endpoint
     await user.getIdToken(true);
     const me = await adminRequest("/api/admin/me");
 
@@ -312,7 +534,6 @@ async function initializeAdminPortal() {
       throw new Error("Firebase project settings are not configured on the server.");
     }
 
-    // Dynamic import adhering strictly to CSP script-src gstatic whitelist
     firebaseSdk = await import("https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js")
       .then(async (appSdk) => ({
         ...appSdk,
@@ -322,7 +543,6 @@ async function initializeAdminPortal() {
     const app = firebaseSdk.initializeApp(config.firebaseConfig);
     firebaseAuth = firebaseSdk.getAuth(app);
 
-    // Watch for session changes
     firebaseSdk.onAuthStateChanged(firebaseAuth, async (user) => {
       if (!user) {
         currentAdminUser = null;

@@ -1,25 +1,15 @@
 "use strict";
 
 const { HttpError } = require("../http-error");
+const { sendJson, sendError } = require("../http-helpers");
 const { requireAdmin } = require("./guard");
-
-// Reusable JSON responder matching the response conventions of server.js.
-function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-  });
-  response.end(JSON.stringify(payload));
-}
-
-function sendError(response, statusCode, message) {
-  sendJson(response, statusCode, { error: message });
-}
+const { handleOverview } = require("./overview");
 
 // Dispatches /api/admin/* requests through admin authentication guards.
 async function handleAdminRoute(request, response, url) {
-  const pathname = typeof url === "string" ? new URL(url, "http://127.0.0.1").pathname : url.pathname;
+  const requestUrl = typeof url === "string" ? new URL(url, "http://127.0.0.1") : url;
+  const { pathname } = requestUrl;
+
   if (!pathname.startsWith("/api/admin/")) {
     return false;
   }
@@ -40,6 +30,10 @@ async function handleAdminRoute(request, response, url) {
       return true;
     }
 
+    if (pathname === "/api/admin/overview") {
+      return await handleOverview(request, response, requestUrl);
+    }
+
     sendError(response, 404, "Not found.");
     return true;
   } catch (error) {
@@ -54,6 +48,4 @@ async function handleAdminRoute(request, response, url) {
 
 module.exports = {
   handleAdminRoute,
-  sendJson,
-  sendError,
 };

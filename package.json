@@ -7,7 +7,7 @@
     "start": "node --env-file-if-exists=.env server.js",
     "seed:questions": "node --env-file-if-exists=.env scripts/seed-questions.js",
     "create:admin": "node --env-file-if-exists=.env scripts/create-admin.js",
-    "check": "node --check server.js && node --check app.js && node --check admin.js && node --check scripts/seed-questions.js && node --check scripts/create-admin.js && node --check data/questions.js && node --check server/http-error.js && node --check server/admin/guard.js && node --check server/admin/routes.js",
+    "check": "node --check server.js && node --check app.js && node --check admin.js && node --check admin-table.js && node --check scripts/seed-questions.js && node --check scripts/create-admin.js && node --check data/questions.js && node --check server/http-error.js && node --check server/http-helpers.js && node --check server/admin/firebase.js && node --check server/admin/guard.js && node --check server/admin/overview.js && node --check server/admin/routes.js",
     "test": "node --test"
   },
   "dependencies": {
