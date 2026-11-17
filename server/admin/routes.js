@@ -1,11 +1,11 @@
 "use strict";
 
-const { HttpError } = require("../http-error");
-const { sendJson, sendError } = require("../http-helpers");
+const { HttpError } = require("../shared/http-error");
+const { sendJson, sendError } = require("../shared/http-helpers");
 const { requireAdmin } = require("./guard");
-const { handleOverview } = require("./overview");
+const { handleOverview } = require("./handlers/overview");
 
-// Dispatches /api/admin/* requests through admin authentication guards.
+// Dispatches /api/admin/* requests through admin authentication guards to handlers.
 async function handleAdminRoute(request, response, url) {
   const requestUrl = typeof url === "string" ? new URL(url, "http://127.0.0.1") : url;
   const { pathname } = requestUrl;

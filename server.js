@@ -8,8 +8,9 @@ const { createHmac, randomUUID, timingSafeEqual } = require("node:crypto");
 const { applicationDefault, getApps, initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue, getFirestore } = require("firebase-admin/firestore");
-const { HttpError } = require("./server/http-error");
+const { HttpError } = require("./server/shared/http-error");
 const { handleAdminRoute } = require("./server/admin/routes");
+const { serveAdminStatic } = require("./server/admin/static");
 
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT) || 3000;
@@ -23,10 +24,6 @@ const staticFiles = new Map([
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/assets/nursing-prep-logo.png", ["assets/nursing-prep-logo.png", "image/png"]],
-  ["/admin.html", ["admin.html", "text/html; charset=utf-8"]],
-  ["/admin.js", ["admin.js", "text/javascript; charset=utf-8"]],
-  ["/admin.css", ["admin.css", "text/css; charset=utf-8"]],
-  ["/admin-table.js", ["admin-table.js", "text/javascript; charset=utf-8"]],
 ]);
 
 let firebaseServices;
@@ -50,7 +47,7 @@ function getFirebaseServices() {
   return firebaseServices;
 }
 
-const { sendJson, sendError } = require("./server/http-helpers");
+const { sendJson, sendError } = require("./server/shared/http-helpers");
 
 function readRawBody(request) {
   return new Promise((resolve, reject) => {
@@ -827,6 +824,9 @@ const server = http.createServer(async (request, response) => {
     }
     if (request.method !== "GET" && request.method !== "HEAD") {
       sendError(response, 405, "Method not allowed.");
+      return;
+    }
+    if (serveAdminStatic(requestUrl.pathname, response, request.method)) {
       return;
     }
     serveStatic(requestUrl.pathname, response, request.method);

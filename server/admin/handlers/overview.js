@@ -1,7 +1,14 @@
 "use strict";
 
-const { getAdminDb } = require("./firebase");
-const { sendJson } = require("../http-helpers");
+const { getAdminDb } = require("../firebase");
+const { sendJson, sendError } = require("../../shared/http-helpers");
+
+let AggregateField;
+try {
+  ({ AggregateField } = require("firebase-admin/firestore"));
+} catch {
+  // Loaded when optional @google-cloud/firestore dependency is available
+}
 
 let cachedOverview = null;
 let cachedAt = 0;
@@ -15,7 +22,7 @@ async function getOverviewMetrics({ bypassCache = false } = {}) {
   }
 
   const db = getAdminDb();
-  const { AggregateField } = require("firebase-admin/firestore");
+  const aggregateField = AggregateField || require("firebase-admin/firestore").AggregateField;
 
   const [
     totalUsersSnap,
@@ -35,7 +42,7 @@ async function getOverviewMetrics({ bypassCache = false } = {}) {
     db.collection("users").where("membershipStatus", "==", "pending_payment").count().get(),
     db.collection("payments")
       .where("status", "==", "success")
-      .aggregate({ totalRevenue: AggregateField.sum("amount") })
+      .aggregate({ totalRevenue: aggregateField.sum("amount") })
       .get(),
     db.collection("questions").count().get(),
     db.collection("questions").where("published", "==", true).count().get(),
@@ -89,9 +96,9 @@ async function getOverviewMetrics({ bypassCache = false } = {}) {
   return payload;
 }
 
+// Dispatches GET /api/admin/overview requests.
 async function handleOverview(request, response, url) {
   if (request.method !== "GET") {
-    const { sendError } = require("../http-helpers");
     sendError(response, 405, "Method not allowed.");
     return true;
   }

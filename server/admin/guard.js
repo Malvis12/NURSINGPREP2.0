@@ -1,7 +1,7 @@
 "use strict";
 
 const { getAdminAuth } = require("./firebase");
-const { HttpError } = require("../http-error");
+const { HttpError } = require("../shared/http-error");
 
 // Verifies Bearer token from request headers, with optional token revocation checking.
 async function requireUser(request, { checkRevoked = false } = {}) {

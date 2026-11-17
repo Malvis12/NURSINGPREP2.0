@@ -1,16 +1,8 @@
 "use strict";
 
-/**
- * Creates an accessible, reactive data table with loading, empty, and error states.
- * @param {Object} options
- * @param {string} options.caption - Accessible table summary for screen readers.
- * @param {Array<{key: string, label: string, render?: (row: Object) => string|Node, align?: "left"|"center"|"right", nowrap?: boolean}>} options.columns - Column specs.
- * @param {(row: Object) => string} [options.getRowId] - Key extractor for rows.
- * @param {string} [options.emptyTitle] - Title displayed when row set is empty.
- * @param {string} [options.emptyHint] - Description displayed when row set is empty.
- * @param {() => void} [options.onRetry] - Callback invoked when retry button is clicked.
- * @returns {{ element: HTMLElement, setLoading: () => void, setRows: (rows: Array<Object>) => void, setError: (message: string) => void }}
- */
+import { createSkeletonBar } from "./skeleton.js";
+
+// Creates an accessible, reactive data table with loading, empty, and error states
 export function createDataTable({
   caption,
   columns,
@@ -60,10 +52,10 @@ export function createDataTable({
       tr.className = "admin-table-skeleton-row";
       columns.forEach((col, colIdx) => {
         const td = document.createElement("td");
-        const bar = document.createElement("div");
-        bar.className = "skeleton";
-        bar.style.height = "16px";
-        bar.style.width = colIdx === 0 ? "70%" : colIdx === 1 ? "85%" : "50%";
+        const bar = createSkeletonBar({
+          height: "16px",
+          width: colIdx === 0 ? "70%" : colIdx === 1 ? "85%" : "50%",
+        });
         td.append(bar);
         tr.append(td);
       });

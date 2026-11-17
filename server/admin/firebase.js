@@ -2,7 +2,7 @@
 
 const { applicationDefault, getApps, initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
-const { HttpError } = require("../http-error");
+const { HttpError } = require("../shared/http-error");
 
 let cachedAuth = null;
 let cachedDb = null;

@@ -7,8 +7,11 @@
     <meta name="description" content="Nursing Prep administrative portal for questions, students, and payment management.">
     <title>Nursing Prep Admin</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin.css">
-    <script type="module" src="/admin.js"></script>
+    <link rel="stylesheet" href="/admin/css/base.css">
+    <link rel="stylesheet" href="/admin/css/layout.css">
+    <link rel="stylesheet" href="/admin/css/components.css">
+    <link rel="stylesheet" href="/admin/css/views.css">
+    <script type="module" src="/admin/js/main.js"></script>
   </head>
   <body class="admin-body">
     <!-- Initial loading state while authenticating session and verifying claims -->
@@ -108,7 +111,7 @@
         </header>
 
         <main id="admin-view-content" class="admin-view-content" aria-live="polite">
-          <!-- Populated dynamically by the registered route view functions -->
+          <!-- Populated dynamically by route views -->
         </main>
       </div>
     </div>
