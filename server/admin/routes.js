@@ -4,6 +4,7 @@ const { HttpError } = require("../shared/http-error");
 const { sendJson, sendError } = require("../shared/http-helpers");
 const { requireAdmin } = require("./guard");
 const { handleOverview } = require("./handlers/overview");
+const { handleStudentsList, handleStudentDetail } = require("./handlers/students");
 
 // Dispatches /api/admin/* requests through admin authentication guards to handlers.
 async function handleAdminRoute(request, response, url) {
@@ -32,6 +33,23 @@ async function handleAdminRoute(request, response, url) {
 
     if (pathname === "/api/admin/overview") {
       return await handleOverview(request, response, requestUrl);
+    }
+
+    if (pathname === "/api/admin/students") {
+      if (request.method !== "GET") {
+        sendError(response, 405, "Method not allowed.");
+        return true;
+      }
+      return await handleStudentsList(request, response, requestUrl);
+    }
+
+    if (pathname.startsWith("/api/admin/students/")) {
+      if (request.method !== "GET") {
+        sendError(response, 405, "Method not allowed.");
+        return true;
+      }
+      const uid = pathname.slice("/api/admin/students/".length);
+      return await handleStudentDetail(request, response, uid);
     }
 
     sendError(response, 404, "Not found.");
