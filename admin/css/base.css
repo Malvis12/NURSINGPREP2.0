@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Admin Base Styles (Variables, Reset, Typography, Screen Shells)
+   ========================================================================== */
+
+/* Badge element distinguishing the staff portal */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(223, 255, 69, 0.12);
+  border: 1px solid rgba(223, 255, 69, 0.35);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Base body reset allowing standard sidebar scrolling */
+.admin-body {
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* Centered screen containers (loading, auth, denied) */
+.admin-loading-screen,
+.admin-auth-screen,
+.admin-denied-screen {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+/* Initial session verification spinner */
+.admin-loading-screen {
+  gap: 16px;
+  align-content: center;
+  text-align: center;
+}
+
+.admin-spinner {
+  width: 38px;
+  height: 38px;
+  margin: 0 auto;
+  border: 3px solid rgba(223, 255, 69, 0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: admin-spin 800ms linear infinite;
+}
+
+.admin-loading-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* Authentication and denied card adjustments */
+.admin-auth-panel,
+.admin-denied-panel {
+  width: min(100%, 460px);
+}
+
+.admin-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.admin-denied-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background: rgba(255, 139, 123, 0.12);
+  border: 1px solid rgba(255, 139, 123, 0.35);
+  color: var(--red);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.admin-denied-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@keyframes admin-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Accessibility: disable transitions and animations for users requesting reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

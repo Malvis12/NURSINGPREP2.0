@@ -8,6 +8,9 @@ const { createHmac, randomUUID, timingSafeEqual } = require("node:crypto");
 const { applicationDefault, getApps, initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { FieldValue, getFirestore } = require("firebase-admin/firestore");
+const { HttpError } = require("./server/shared/http-error");
+const { handleAdminRoute } = require("./server/admin/routes");
+const { serveAdminStatic } = require("./server/admin/static");
 
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT) || 3000;
@@ -22,13 +25,6 @@ const staticFiles = new Map([
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
   ["/assets/nursing-prep-logo.png", ["assets/nursing-prep-logo.png", "image/png"]],
 ]);
-
-class HttpError extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
 
 let firebaseServices;
 
@@ -51,18 +47,7 @@ function getFirebaseServices() {
   return firebaseServices;
 }
 
-function sendJson(response, statusCode, payload) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-  });
-  response.end(JSON.stringify(payload));
-}
-
-function sendError(response, statusCode, message) {
-  sendJson(response, statusCode, { error: message });
-}
+const { sendJson, sendError } = require("./server/shared/http-helpers");
 
 function readRawBody(request) {
   return new Promise((resolve, reject) => {
@@ -773,6 +758,9 @@ function serveStatic(pathname, response, method) {
 }
 
 async function handleApi(request, response, requestUrl) {
+  if (await handleAdminRoute(request, response, requestUrl)) {
+    return;
+  }
   const { pathname } = requestUrl;
   if (pathname === "/api/config" && request.method === "GET") {
     sendJson(response, 200, getPublicFirebaseConfig());
@@ -836,6 +824,9 @@ const server = http.createServer(async (request, response) => {
     }
     if (request.method !== "GET" && request.method !== "HEAD") {
       sendError(response, 405, "Method not allowed.");
+      return;
+    }
+    if (serveAdminStatic(requestUrl.pathname, response, request.method)) {
       return;
     }
     serveStatic(requestUrl.pathname, response, request.method);

@@ -1,0 +1,256 @@
+/* ==========================================================================
+   Admin Layout Styles (Sidebar, Topbar, Main Workspace)
+   ========================================================================== */
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--canvas);
+}
+
+/* Left persistent sidebar */
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  border-right: 1px solid var(--line);
+  background: #0d0e0b;
+  overflow-y: auto;
+}
+
+.admin-sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+/* Navigation list */
+.admin-nav {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.admin-nav-icon {
+  font-size: 15px;
+  color: inherit;
+}
+
+.admin-nav-item:hover {
+  background: #171813;
+  color: var(--ink);
+}
+
+.admin-nav-item.is-active {
+  background: #202118;
+  color: var(--accent);
+}
+
+.admin-nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Sidebar footer with account metadata and sign out */
+.admin-sidebar-footer {
+  display: grid;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.admin-user-details {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-user-caption {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.admin-user-email {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-signout-btn {
+  width: 100%;
+  min-height: 36px;
+  font-size: 11px;
+}
+
+/* Workspace main content */
+.admin-workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 28px clamp(20px, 4vw, 48px) 56px;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-topbar .eyebrow {
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+
+.admin-view-heading {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 3.5vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.admin-student-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+/* Dynamic view host */
+.admin-view-content {
+  padding-top: 28px;
+  animation: admin-fade-in 240ms ease both;
+}
+
+@keyframes admin-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tablet landscape breakpoint */
+@media (max-width: 1050px) {
+  .admin-shell {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+  .admin-workspace {
+    padding-top: 22px;
+  }
+}
+
+/* Tablet portrait breakpoint: collapse sidebar into top navigation */
+@media (max-width: 820px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    background: rgba(13, 14, 11, 0.95);
+    backdrop-filter: blur(12px);
+  }
+
+  .admin-sidebar-top {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-nav {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .admin-nav-item {
+    flex: 0 0 auto;
+  }
+
+  .admin-sidebar-footer {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+  }
+
+  .admin-signout-btn {
+    width: auto;
+  }
+
+  .admin-workspace {
+    padding: 24px 20px 48px;
+  }
+}
+
+/* Mobile portrait breakpoint */
+@media (max-width: 560px) {
+  .admin-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-view-heading {
+    font-size: 26px;
+  }
+
+  .admin-sidebar {
+    padding: 12px 16px;
+  }
+
+  .admin-workspace {
+    padding: 20px 16px 40px;
+  }
+}
