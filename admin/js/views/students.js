@@ -87,7 +87,7 @@ export function renderStudents(container) {
           btn.className = "student-name-btn";
           btn.textContent = row.displayName || "—";
           btn.setAttribute("aria-label", `View details for ${row.displayName || row.email || "student"}`);
-          btn.addEventListener("click", () => openStudentDetail(row.uid, drawer, btn));
+          btn.addEventListener("click", () => openStudentDetail(row.uid, drawer, btn, () => fetchStudents()));
           return btn;
         },
       },

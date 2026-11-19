@@ -2,6 +2,8 @@
 
 import { adminRequest } from "../api.js";
 import { createSkeletonBar } from "../components/skeleton.js";
+import { toast } from "../components/toast.js";
+import { getSharedConfirmDialog } from "../components/confirm-dialog.js";
 
 function formatDate(iso) {
   if (!iso) return "—";
@@ -15,16 +17,10 @@ function formatDate(iso) {
 function createFieldGroup(label, valueNode) {
   const row = document.createElement("div");
   row.className = "detail-field";
-  const dt = document.createElement("span");
-  dt.className = "detail-field-label";
-  dt.textContent = label;
-  const dd = document.createElement("span");
-  dd.className = "detail-field-value";
-  if (valueNode instanceof Node) {
-    dd.append(valueNode);
-  } else {
-    dd.textContent = valueNode != null && valueNode !== "" ? String(valueNode) : "—";
-  }
+  const dt = Object.assign(document.createElement("span"), { className: "detail-field-label", textContent: label });
+  const dd = Object.assign(document.createElement("span"), { className: "detail-field-value" });
+  if (valueNode instanceof Node) dd.append(valueNode);
+  else dd.textContent = valueNode != null && valueNode !== "" ? String(valueNode) : "—";
   row.append(dt, dd);
   return row;
 }
@@ -32,13 +28,10 @@ function createFieldGroup(label, valueNode) {
 function createStatBox(label, value) {
   const box = document.createElement("div");
   box.className = "detail-stat-box";
-  const val = document.createElement("span");
-  val.className = "detail-stat-value";
-  val.textContent = String(value);
-  const lbl = document.createElement("span");
-  lbl.className = "detail-stat-label";
-  lbl.textContent = label;
-  box.append(val, lbl);
+  box.append(
+    Object.assign(document.createElement("span"), { className: "detail-stat-value", textContent: String(value) }),
+    Object.assign(document.createElement("span"), { className: "detail-stat-label", textContent: label })
+  );
   return box;
 }
 
@@ -46,15 +39,13 @@ function renderDetailSkeleton() {
   const wrap = document.createElement("div");
   wrap.className = "detail-skeleton";
   for (let i = 0; i < 5; i += 1) {
-    const bar = createSkeletonBar({ height: "18px", width: i % 2 === 0 ? "75%" : "55%" });
-    bar.style.marginBottom = "14px";
-    wrap.append(bar);
+    wrap.append(createSkeletonBar({ height: "18px", width: i % 2 === 0 ? "75%" : "55%" }));
   }
   return wrap;
 }
 
 // Fetches student profile and renders drawer contents
-export async function openStudentDetail(uid, drawer, opener) {
+export async function openStudentDetail(uid, drawer, opener, onStatusChanged) {
   async function load() {
     drawer.open({ title: "Student Profile", content: renderDetailSkeleton(), opener });
 
@@ -66,9 +57,7 @@ export async function openStudentDetail(uid, drawer, opener) {
 
       const profileSection = document.createElement("section");
       profileSection.className = "detail-section";
-      const profileHeading = document.createElement("h3");
-      profileHeading.className = "detail-heading";
-      profileHeading.textContent = "Student Information";
+      const profileHeading = Object.assign(document.createElement("h3"), { className: "detail-heading", textContent: "Student Information" });
       profileSection.append(profileHeading);
 
       const statusPill = document.createElement("span");
@@ -87,14 +76,51 @@ export async function openStudentDetail(uid, drawer, opener) {
         createFieldGroup("Joined Date", formatDate(profile.createdAt))
       );
       profileSection.append(grid);
+
+      if (profile.membershipStatus !== "active") {
+        const activateBtn = document.createElement("button");
+        activateBtn.type = "button";
+        activateBtn.className = "button button-primary detail-activate-btn";
+        activateBtn.textContent = "Activate manually";
+        activateBtn.addEventListener("click", () => {
+          const confirmDialog = getSharedConfirmDialog();
+          confirmDialog.open({
+            title: "Activate Student Membership",
+            message: `Manually activate membership for ${profile.displayName || profile.email || "this student"}? This grants full access and creates an audit log entry.`,
+            confirmText: "Activate Membership",
+            opener: activateBtn,
+            onConfirm: async (reason) => {
+              try {
+                await adminRequest(`/api/admin/students/${encodeURIComponent(uid)}/activate`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ reason }),
+                });
+                toast("Student membership activated successfully.", "success");
+                confirmDialog.close();
+                await load();
+                if (typeof onStatusChanged === "function") onStatusChanged();
+              } catch (err) {
+                if (err.status === 409) {
+                  toast("Already active", "info");
+                  confirmDialog.close();
+                  await load();
+                  if (typeof onStatusChanged === "function") onStatusChanged();
+                } else {
+                  toast("Failed to activate: " + (err.status ? `Request failed (${err.status})` : "Please try again."), "error");
+                  throw err;
+                }
+              }
+            },
+          });
+        });
+        profileSection.append(activateBtn);
+      }
       container.append(profileSection);
 
       const statsSection = document.createElement("section");
       statsSection.className = "detail-section";
-      const statsHeading = document.createElement("h3");
-      statsHeading.className = "detail-heading";
-      statsHeading.textContent = "Study Progress";
-      statsSection.append(statsHeading);
+      statsSection.append(Object.assign(document.createElement("h3"), { className: "detail-heading", textContent: "Study Progress" }));
 
       const practiced = profile.progress?.questionsPracticed || 0;
       const correct = profile.progress?.totalCorrect || 0;
@@ -112,16 +138,10 @@ export async function openStudentDetail(uid, drawer, opener) {
 
       const sessionsSection = document.createElement("section");
       sessionsSection.className = "detail-section";
-      const sessionsHeading = document.createElement("h3");
-      sessionsHeading.className = "detail-heading";
-      sessionsHeading.textContent = "Recent Sessions";
-      sessionsSection.append(sessionsHeading);
+      sessionsSection.append(Object.assign(document.createElement("h3"), { className: "detail-heading", textContent: "Recent Sessions" }));
 
       if (!Array.isArray(recentSessions) || recentSessions.length === 0) {
-        const emptyMsg = document.createElement("p");
-        emptyMsg.className = "detail-empty-note";
-        emptyMsg.textContent = "No completed exam or practice sessions recorded yet.";
-        sessionsSection.append(emptyMsg);
+        sessionsSection.append(Object.assign(document.createElement("p"), { className: "detail-empty-note", textContent: "No completed exam or practice sessions recorded yet." }));
       } else {
         const list = document.createElement("div");
         list.className = "detail-sessions-list";
@@ -130,23 +150,17 @@ export async function openStudentDetail(uid, drawer, opener) {
           item.className = "detail-session-item";
           const top = document.createElement("div");
           top.className = "detail-session-top";
-          const topic = document.createElement("span");
-          topic.className = "detail-session-topic";
-          topic.textContent = s.topic || "Practice Exam";
-          const score = document.createElement("span");
-          score.className = "detail-session-score";
-          score.textContent = `${s.score}/${s.total} (${s.percent}%)`;
-          top.append(topic, score);
+          top.append(
+            Object.assign(document.createElement("span"), { className: "detail-session-topic", textContent: s.topic || "Practice Exam" }),
+            Object.assign(document.createElement("span"), { className: "detail-session-score", textContent: `${s.score}/${s.total} (${s.percent}%)` })
+          );
 
           const bottom = document.createElement("div");
           bottom.className = "detail-session-bottom";
-          const diff = document.createElement("span");
-          diff.className = "detail-session-diff";
-          diff.textContent = s.difficulty ? `${s.difficulty} difficulty` : "";
-          const date = document.createElement("span");
-          date.className = "detail-session-date";
-          date.textContent = formatDate(s.completedAt);
-          bottom.append(diff, date);
+          bottom.append(
+            Object.assign(document.createElement("span"), { className: "detail-session-diff", textContent: s.difficulty ? `${s.difficulty} difficulty` : "" }),
+            Object.assign(document.createElement("span"), { className: "detail-session-date", textContent: formatDate(s.completedAt) })
+          );
 
           item.append(top, bottom);
           list.append(item);
@@ -160,13 +174,8 @@ export async function openStudentDetail(uid, drawer, opener) {
       const errWrap = document.createElement("div");
       errWrap.className = "detail-error";
       errWrap.setAttribute("role", "alert");
-      const errMsg = document.createElement("p");
-      errMsg.className = "message error-message";
-      errMsg.textContent = err.message || "Failed to load student details.";
-      const retryBtn = document.createElement("button");
-      retryBtn.type = "button";
-      retryBtn.className = "button button-secondary";
-      retryBtn.textContent = "Retry";
+      const errMsg = Object.assign(document.createElement("p"), { className: "message error-message", textContent: err.message || "Failed to load student details." });
+      const retryBtn = Object.assign(document.createElement("button"), { type: "button", className: "button button-secondary", textContent: "Retry" });
       retryBtn.addEventListener("click", () => load());
       errWrap.append(errMsg, retryBtn);
       drawer.open({ title: "Student Profile", content: errWrap, opener });
