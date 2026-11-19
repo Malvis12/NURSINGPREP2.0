@@ -84,3 +84,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Student Table Interactive Rows
+   ========================================================================== */
+
+.student-table tbody tr:not(.admin-table-skeleton-row) {
+  cursor: pointer;
+}
+
+.student-table tbody tr:has(.admin-table-empty-cell),
+.student-table tbody tr:has(.admin-table-error) {
+  cursor: default;
+}
+
+.student-table tbody tr:hover:not(.admin-table-skeleton-row):not(:has(.admin-table-empty-cell)):not(:has(.admin-table-error)) {
+  background: rgba(223, 255, 69, 0.04);
+}
