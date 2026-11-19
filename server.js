@@ -670,7 +670,7 @@ async function verifyPaystackPayment(reference) {
   }
 
   const verifiedAt = new Date().toISOString();
-  await db.runTransaction(async (transactionWriter) => {
+  const activated = await db.runTransaction(async (transactionWriter) => {
     const [latestPayment, latestProfile] = await Promise.all([
       transactionWriter.get(paymentRef),
       transactionWriter.get(userRef),
