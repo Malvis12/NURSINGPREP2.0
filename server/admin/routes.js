@@ -5,6 +5,7 @@ const { sendJson, sendError } = require("../shared/http-helpers");
 const { requireAdmin } = require("./guard");
 const { handleOverview } = require("./handlers/overview");
 const { handleStudentsList, handleStudentDetail } = require("./handlers/students");
+const { handleActivateStudent } = require("./handlers/student-actions");
 
 // Dispatches /api/admin/* requests through admin authentication guards to handlers.
 async function handleAdminRoute(request, response, url) {
@@ -41,6 +42,15 @@ async function handleAdminRoute(request, response, url) {
         return true;
       }
       return await handleStudentsList(request, response, requestUrl);
+    }
+
+    const activateMatch = pathname.match(/^\/api\/admin\/students\/([^/]+)\/activate$/);
+    if (activateMatch) {
+      if (request.method !== "POST") {
+        sendError(response, 405, "Method not allowed.");
+        return true;
+      }
+      return await handleActivateStudent(request, response, activateMatch[1], adminUser);
     }
 
     if (pathname.startsWith("/api/admin/students/")) {

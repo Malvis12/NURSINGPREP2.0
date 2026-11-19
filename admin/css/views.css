@@ -74,30 +74,118 @@
 }
 
 @media (max-width: 1050px) {
-  .overview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 560px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
-  }
+  .overview-grid { grid-template-columns: 1fr; }
 }
 
 /* ==========================================================================
    Student Table Interactive Rows
    ========================================================================== */
 
-.student-table tbody tr:not(.admin-table-skeleton-row) {
-  cursor: pointer;
-}
-
+.student-table tbody tr:not(.admin-table-skeleton-row) { cursor: pointer; }
 .student-table tbody tr:has(.admin-table-empty-cell),
-.student-table tbody tr:has(.admin-table-error) {
-  cursor: default;
-}
-
+.student-table tbody tr:has(.admin-table-error) { cursor: default; }
 .student-table tbody tr:hover:not(.admin-table-skeleton-row):not(:has(.admin-table-empty-cell)):not(:has(.admin-table-error)) {
   background: rgba(223, 255, 69, 0.04);
+}
+
+/* ==========================================================================
+   Admin Confirmation Modal Dialog
+   ========================================================================== */
+
+.admin-confirm-dialog:not([open]) { display: none; }
+.admin-confirm-dialog[open] {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.admin-confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.confirm-dialog-panel {
+  width: min(100% - 32px, 440px);
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.confirm-dialog-title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.confirm-dialog-message {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.confirm-reason-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #11120e;
+  color: var(--ink);
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 72px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.confirm-reason-textarea:focus {
+  border-color: var(--accent);
+}
+
+.confirm-counter-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+}
+
+.confirm-char-counter {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.detail-activate-btn {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.detail-skeleton > * {
+  margin-bottom: 14px;
 }
