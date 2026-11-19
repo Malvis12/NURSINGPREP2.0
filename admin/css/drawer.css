@@ -2,7 +2,11 @@
    Admin Drawer Dialog and Profile Inspector Styles
    ========================================================================== */
 
-.admin-drawer {
+.admin-drawer:not([open]) {
+  display: none;
+}
+
+.admin-drawer[open] {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -185,5 +189,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .admin-drawer::backdrop,
-  .drawer-panel { transition: none !important; }
+  .drawer-panel { transition: none; }
 }
