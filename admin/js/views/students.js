@@ -110,21 +110,20 @@ export function renderStudents(container) {
     emptyHint: "Try adjusting your search criteria or filter selections.",
     onRetry: () => fetchStudents(),
   });
+  table.element.classList.add("student-table");
   container.append(table.element);
 
+  table.element.querySelector("tbody").addEventListener("click", (event) => {
+    if (event.target.closest("button, a, input, select, textarea")) return;
+    const tr = event.target.closest("tr");
+    if (!tr || tr.classList.contains("admin-table-skeleton-row") || tr.querySelector(".admin-table-empty-cell, .admin-table-error")) return;
+    const nameBtn = tr.querySelector(".student-name-btn");
+    if (nameBtn) nameBtn.click();
+  });
+
   const pagination = createPagination({
-    onPrev: () => {
-      if (pageIndex > 0) {
-        pageIndex -= 1;
-        fetchStudents();
-      }
-    },
-    onNext: () => {
-      if (lastHasMore) {
-        pageIndex += 1;
-        fetchStudents();
-      }
-    },
+    onPrev: () => { if (pageIndex > 0) { pageIndex -= 1; fetchStudents(); } },
+    onNext: () => { if (lastHasMore) { pageIndex += 1; fetchStudents(); } },
   });
   container.append(pagination.element);
 
